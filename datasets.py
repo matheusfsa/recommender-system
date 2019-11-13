@@ -11,6 +11,8 @@ from nltk.tokenize import RegexpTokenizer
 from nltk.stem.wordnet import WordNetLemmatizer
 from sklearn.feature_extraction.text import CountVectorizer
 from tfidf import tf_id
+from plot2vec import plot2vec
+from word2vec import word2vec
 
 def get_df_movies():
     df_movies = pd.read_csv('./datasets/movies_imdb.csv')
@@ -24,7 +26,6 @@ def get_count(df_movies):
     #nltk.download('wordnet')
     #nltk.download('stopwords')
     stop_words = set(stopwords.words("english"))
-    print(df_movies.shape)
     corpus = []
     for i in df_movies.index:
         #Remove punctuations
@@ -51,13 +52,15 @@ def get_count(df_movies):
         text = " ".join(text)
         corpus.append(text)
     cv = CountVectorizer(max_df=0.8,stop_words=stop_words, max_features=2000, ngram_range=(1,3))
-    return cv.fit_transform(corpus)
+    return cv.fit_transform(corpus), corpus
 
 
-def get_dataset(feats, new_feats_func):
+def get_dataset(feats, new_feats_func, **kwargs):
     df_movies = get_df_movies()
-    count = get_count(df_movies)
-    new_feats = new_feats_func(count, df_movies)
+    count, corpus = get_count(df_movies)
+    kwargs['corpus'] = corpus
+    kwargs['movies'] = df_movies
+    new_feats = new_feats_func(count, **kwargs)
     X = pd.DataFrame(new_feats, index=df_movies.index, columns=['feat_'+ str(i) for i in range(new_feats.shape[1])])
     df_movies_all = df_movies.loc[:, feats]
     df_movies_all = pd.get_dummies(df_movies_all)
@@ -67,14 +70,23 @@ def get_dataset(feats, new_feats_func):
     df_movies_all['movieId'] = df_movies['movieId'] 
     return df_movies_all
 
+#def movie2vec(feats)
 
 
-def dataset_tfid(feats):
-    return get_dataset(feats, tf_id)
+def dataset_tfid(feats, **kwargs):
+    return get_dataset(feats, tf_id, **kwargs)
 
-def dataset_ratings(X, user):
-    df_ratings = pd.read_csv('./datasets/ml-20m/ratings.csv')
-    df_ratings_u = df_ratings[df_ratings['userId'] == 1]
+
+def dataset_plot2vec(feats, **kwargs):
+    return get_dataset(feats, plot2vec, **kwargs)
+
+def dataset_word2vec(feats, **kwargs):
+    return get_dataset(feats, word2vec, **kwargs)
+
+def dataset_ratings_user(X, **kwargs):
+    user = kwargs.get('user', 1)
+    df_ratings = kwargs.get('df_ratings', pd.read_csv('./datasets/ml-20m/ratings.csv'))
+    df_ratings_u = df_ratings[df_ratings['userId'] == user]
     df_ratings_u.head()
     df_ratings_u = df_ratings_u.drop(columns=['userId'])
     df_ratings_u.index = df_ratings_u['movieId']

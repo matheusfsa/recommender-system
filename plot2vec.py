@@ -20,11 +20,11 @@ class Plot2Vec(nn.Module):
         log_probs = F.log_softmax(out, dim=1)
         return log_probs
 
-    def transform(X):
+    def transform(self, X):
         return Variable(F.relu(self.linear1(torch.tensor(X.toarray(), dtype=torch.float)))).numpy()
 
 
-def fit(X, y, epochs=5, n_features=100)
+def fit(X, y, epochs=5, n_features=100):
     losses = []
     loss_function = nn.NLLLoss()
     model = Plot2Vec(X.shape[1], n_features, y.shape[1])
@@ -64,8 +64,13 @@ def transform(X, model):
     return model.transform(X)
 
 
-def plot2vec(X, movies):
+def plot2vec(X, **kwargs):
+    epochs = kwargs.get('epochs', 5)
+    n_features = kwargs.get('n_features', 100)
+    movies = kwargs['movies']
     genres = movies['genres'].str.get_dummies()
     y = genres.values
     model, losses = fit(X, y)
     return transform(X, model)
+
+#def movie2vec(df_movies, *):

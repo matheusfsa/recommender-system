@@ -1,0 +1,36 @@
+dataset_tfid(['genres', 'rating', 'runtimes', 'year'], op='sum', n_features=1000)
+Precision:
+ridge    0.881937
+kr       0.897847
+ada      0.885882
+gbr      0.881820
+Recall:
+ridge    0.924875
+kr       0.909419
+ada      0.914218
+gbr      0.907842
+
+dataset_tfid(['genres', 'rating', 'runtimes', 'year'], op='sum', n_features=2000)
+Precision:
+ridge    0.834810
+kr       0.815076
+ada      0.853656
+gbr      0.838787
+Recall:
+ridge    0.703634
+kr       0.709058
+ada      0.752096
+gbr      0.686952
+
+X = dataset_tfid(['genres', 'rating', 'runtimes', 'year'], op='sum', n_features=750)
+Precision:
+ridge    0.889816
+kr       0.889577
+ada      0.875484
+gbr      0.873946
+
+Recall:
+ridge    0.723934
+kr       0.731269
+ada      0.715010
+gbr      0.692919
