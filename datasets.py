@@ -60,15 +60,21 @@ def get_dataset(feats, new_feats_func, **kwargs):
     count, corpus = get_count(df_movies)
     kwargs['corpus'] = corpus
     kwargs['movies'] = df_movies
-    new_feats = new_feats_func(count, **kwargs)
+    new_feats = kwargs.get('new_feats', None)
+    if new_feats is None:
+        new_feats = new_feats_func(count, **kwargs)
     X = pd.DataFrame(new_feats, index=df_movies.index, columns=['feat_'+ str(i) for i in range(new_feats.shape[1])])
-    df_movies_all = df_movies.loc[:, feats]
-    df_movies_all = pd.get_dummies(df_movies_all)
-    for col in X.columns:
-        df_movies_all[col] = X[col]
+    if feats:
+        df_movies_all = df_movies.loc[:, feats]
+        df_movies_all = pd.get_dummies(df_movies_all)
+        for col in X.columns:
+            df_movies_all[col] = X[col]
+    else:
+        df_movies_all  = X 
+    
     df_movies_all['title'] = df_movies['title'] 
     df_movies_all['movieId'] = df_movies['movieId'] 
-    return df_movies_all
+    return df_movies_all, new_feats
 
 #def movie2vec(feats)
 

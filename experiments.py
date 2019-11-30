@@ -31,11 +31,12 @@ def train_predict(X_train, y_train, X_test, y_test):
         y_pred = (model.predict(X_test) >= 3)*1
         precision[name] = precision_score(y_true, y_pred)
         recall[name] = recall_score(y_true, y_pred)
-    
+    ridge = RidgeCV(cv=5)
     get_precision_recall('ridge', RidgeCV(cv=5))
-    get_precision_recall('kr', KernelRidge())
-    get_precision_recall('ada',AdaBoostRegressor(random_state=0, n_estimators=100))
-    get_precision_recall('gbr',GradientBoostingRegressor(n_estimators=100, learning_rate=0.1,max_depth=1, random_state=0, loss='ls'))
+    print(ridge.alpha_)
+    #get_precision_recall('kr', KernelRidge())
+    #get_precision_recall('ada',AdaBoostRegressor(random_state=0, n_estimators=100))
+    #get_precision_recall('gbr',GradientBoostingRegressor(n_estimators=100, learning_rate=0.1,max_depth=1, random_state=0, loss='ls'))
     return precision, recall
 
 
